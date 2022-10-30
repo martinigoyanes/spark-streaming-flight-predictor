@@ -30,8 +30,28 @@ services:
       retries: 3
       start_period: 20s
 
+  elastic:
+    container_name: flight-predictor_elastic
+    tty: True
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.2
+    restart: always
+    environment:
+        cluster.name: "es-docker"
+        discovery.type: single-node
+        node.name: "elastic"
+        ES_JAVA_OPTS: "-Xms1024m -Xmx1024m"
+    ports:
+        - 9200:9200
+    ulimits:
+        memlock:
+            soft: -1
+            hard: -1
+    volumes:
+        - elastic_data:/usr/share/elasticsearch/data
+
 volumes:
   mongo_data:
+  elastic_data:
 
 # docker-compose -f docker-compose.yml up
 # docker-compose -f docker-compose.yml run --rm -p 8080:8080 dev-gfadmin-back

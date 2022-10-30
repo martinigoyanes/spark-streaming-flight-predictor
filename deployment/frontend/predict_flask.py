@@ -12,10 +12,10 @@ import predict_utils
 # Set up Flask, Mongo and Elasticsearch
 app = Flask(__name__)
 
-client = MongoClient("flight-predictor_mongo-db")
+client = MongoClient(host="flight-predictor_mongo-db")
 
-from pyelasticsearch import ElasticSearch
-elastic = ElasticSearch(config.ELASTIC_URL)
+from elasticsearch import Elasticsearch
+elastic = Elasticsearch(config.ELASTIC_URL)
 
 import json
 
@@ -158,7 +158,7 @@ def search_airplanes():
       query['query']['bool']['must'].append({'match': {field: value}})
 
   # Query elasticsearch, process to get records and count
-  results = elastic.search(query)
+  results = elastic.search(body=query)
   airplanes, airplane_count = predict_utils.process_search(results)
 
   # Persist search parameters in the form template
@@ -269,7 +269,7 @@ def search_flights():
     query['query']['bool']['must'].append({'match': {'FlightNum': flight_number}})
 
   # Query elasticsearch, process to get records and count
-  results = elastic.search(query)
+  results = elastic.search(body=query)
   flights, flight_count = predict_utils.process_search(results)
 
   # Persist search parameters in the form template

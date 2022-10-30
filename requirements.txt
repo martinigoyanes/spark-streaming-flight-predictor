@@ -8,7 +8,7 @@ kafka-python
 matplotlib
 numpy
 py4j
-pyelasticsearch
+elasticsearch
 pymongo
 requests
 scipy

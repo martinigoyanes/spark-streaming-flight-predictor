@@ -2,5 +2,5 @@ Flask==2.2.2
 iso8601==1.1.0
 joblib==1.2.0
 kafka-python
-pyelasticsearch==1.4.1
+elasticsearch
 pymongo==4.3.2

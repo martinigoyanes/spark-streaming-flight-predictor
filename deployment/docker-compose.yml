@@ -48,6 +48,26 @@ services:
             hard: -1
     volumes:
         - elastic_data:/usr/share/elasticsearch/data
+  
+  zookeeper:
+    container_name: flight-predictor_zookeeper
+    hostname: zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+        - 2181:2181
+
+  kafka:
+    container_name: kafka
+    hostname: kafka
+    image: wurstmeister/kafka
+    ports:
+        - 9092:9092
+    environment:
+        DOCKER_API_VERSION: 1.22
+        KAFKA_ADVERTISED_HOST_NAME: kafka
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   mongo_data:

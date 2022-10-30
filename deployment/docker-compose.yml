@@ -15,10 +15,19 @@ services:
     ports:
         - 5000:5000
     depends_on:
-      - mongodb
+      - mongodb-setup
       - elastic
       - kafka
-      - zookeeper
+
+  spark-trainer:
+    container_name: flight-predictor_spark-trainer
+    image: flight-predictor_spark-trainer
+    build:
+      context: spark-trainer/
+      dockerfile: Dockerfile
+      args:
+        - USERNAME=spark-trainer
+
   mongodb:
     container_name: flight-predictor_mongodb
     hostname: mongodb
@@ -34,6 +43,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+
+  mongodb-setup:
+    container_name: flight-predictor_mongodb-setup
+    image: flight-predictor_mongodb-setup
+    build:
+      context: mongodb/
+      dockerfile: Dockerfile.setup
+    depends_on:
+      - mongodb
 
   elastic:
     container_name: flight-predictor_elastic

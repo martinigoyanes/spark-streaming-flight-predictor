@@ -1,0 +1,15 @@
+bs4
+frozendict
+geopy
+ipython
+matplotlib
+numpy
+py4j
+requests
+scipy
+sklearn
+tabulate
+tldextract
+wikipedia
+findspark
+iso8601

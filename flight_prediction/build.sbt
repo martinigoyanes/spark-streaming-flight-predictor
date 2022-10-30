@@ -6,7 +6,7 @@ scalaVersion := "2.12.10"
 
 val sparkVersion = "3.1.2"
 
-mainClass in Compile := Some("es.upm.dit.ging.predictor.MakePrediction")
+mainClass in Compile := Some("MakePrediction")
 
 resolvers ++= Seq(
   "apache-snapshots" at "https://repository.apache.org/snapshots/"
@@ -20,5 +20,4 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-hive" % sparkVersion,
   "org.apache.spark" %% "spark-sql-kafka-0-10" % "3.1.2",
   "org.mongodb.spark" %% "mongo-spark-connector" % "3.0.1"
-
 )

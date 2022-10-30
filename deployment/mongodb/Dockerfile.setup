@@ -1,0 +1,6 @@
+FROM mongo:5.0.3
+
+COPY origin_dest_distances.jsonl /
+COPY import_distances.sh /
+
+CMD ["./import_distances.sh"]

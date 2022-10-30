@@ -1,4 +1,4 @@
 # config.py, a configuration file for index.py
 RECORDS_PER_PAGE=15
 AIRPLANE_RECORDS_PER_PAGE=5
-ELASTIC_URL='http://flight-predictor_elastic:9200'
+ELASTIC_URL='http://elastic:9200'

@@ -12,7 +12,7 @@ import predict_utils
 # Set up Flask, Mongo and Elasticsearch
 app = Flask(__name__)
 
-client = MongoClient(host="flight-predictor_mongo-db")
+client = MongoClient(host="mongodb")
 
 from elasticsearch import Elasticsearch
 elastic = Elasticsearch(config.ELASTIC_URL)

@@ -19,14 +19,12 @@ services:
       - elastic
       - kafka
 
-  spark-trainer:
-    container_name: flight-predictor_spark-trainer
-    image: flight-predictor_spark-trainer
+  predictor:
+    container_name: flight-predictor_predictor
+    image: flight-predictor_spark-predictor
     build:
-      context: spark-trainer/
+      context: predictor/
       dockerfile: Dockerfile
-      args:
-        - USERNAME=spark-trainer
 
   mongodb:
     container_name: flight-predictor_mongodb

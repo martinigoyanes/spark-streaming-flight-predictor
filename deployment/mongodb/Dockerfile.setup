@@ -1,6 +1,9 @@
 FROM mongo:5.0.3
 
-COPY origin_dest_distances.jsonl /
-COPY import_distances.sh /
+RUN apt-get update
+RUN apt install -y curl
+# Download data to provision database
+RUN curl -Lko /origin_dest_distances.jsonl http://s3.amazonaws.com/agile_data_science/origin_dest_distances.jsonl
+COPY setup_mongodb.sh /
 
-CMD ["./import_distances.sh"]
+CMD ["./setup_mongodb.sh"]

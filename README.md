@@ -3,9 +3,9 @@ Real time flight cancellation predictor using Kafka, Zookeeper, Spark Streaming,
 
 # How to Run:
 Start: 
-```docker-compose up --build --force-recreate```
+``docker-compose up --build --force-recreate``
 Clean stop:
-```docker-compose down --volumes```
+``docker-compose down --volumes``
 
 ## Front End Architecture
 

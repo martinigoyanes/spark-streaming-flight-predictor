@@ -12,7 +12,7 @@ import predict_utils
 # Set up Flask, Mongo and Elasticsearch
 app = Flask(__name__)
 
-client = MongoClient(host="mongodb")
+client = MongoClient(host="mongo")
 
 from elasticsearch import Elasticsearch
 elastic = Elasticsearch(config.ELASTIC_URL)
@@ -25,7 +25,7 @@ import datetime
 
 # Setup Kafka
 from kafka import KafkaProducer
-producer = KafkaProducer(bootstrap_servers=['localhost:9092'],api_version=(0,10))
+producer = KafkaProducer(bootstrap_servers=['kafka:9092'],api_version=(0,10))
 PREDICTION_TOPIC = 'flight_delay_classification_request'
 
 import uuid
@@ -38,7 +38,7 @@ def on_time_performance():
   flight_date = request.args.get('FlightDate')
   flight_num = request.args.get('FlightNum')
   
-  flight = client.agile_data_science.on_time_performance.find_one({
+  flight = client.flight_predictor.on_time_performance.find_one({
     'Carrier': carrier,
     'FlightDate': flight_date,
     'FlightNum': flight_num
@@ -50,7 +50,7 @@ def on_time_performance():
 @app.route("/flights/<origin>/<dest>/<flight_date>")
 def list_flights(origin, dest, flight_date):
   
-  flights = client.agile_data_science.on_time_performance.find(
+  flights = client.flight_predictor.on_time_performance.find(
     {
       'Origin': origin,
       'Dest': dest,
@@ -73,7 +73,7 @@ def list_flights(origin, dest, flight_date):
 # Controller: Fetch a flight table
 @app.route("/total_flights")
 def total_flights():
-  total_flights = client.agile_data_science.flights_by_month.find({}, 
+  total_flights = client.flight_predictor.flights_by_month.find({}, 
     sort = [
       ('Year', 1),
       ('Month', 1)
@@ -83,7 +83,7 @@ def total_flights():
 # Serve the chart's data via an asynchronous request (formerly known as 'AJAX')
 @app.route("/total_flights.json")
 def total_flights_json():
-  total_flights = client.agile_data_science.flights_by_month.find({}, 
+  total_flights = client.flight_predictor.flights_by_month.find({}, 
     sort = [
       ('Year', 1),
       ('Month', 1)
@@ -93,7 +93,7 @@ def total_flights_json():
 # Controller: Fetch a flight chart
 @app.route("/total_flights_chart")
 def total_flights_chart():
-  total_flights = client.agile_data_science.flights_by_month.find({}, 
+  total_flights = client.flight_predictor.flights_by_month.find({}, 
     sort = [
       ('Year', 1),
       ('Month', 1)
@@ -175,14 +175,14 @@ def search_airplanes():
 @app.route("/airplanes/chart/manufacturers.json")
 @app.route("/airplanes/chart/manufacturers.json")
 def airplane_manufacturers_chart():
-  mfr_chart = client.agile_data_science.airplane_manufacturer_totals.find_one()
+  mfr_chart = client.flight_predictor.airplane_manufacturer_totals.find_one()
   return json.dumps(mfr_chart)
 
 # Controller: Fetch a flight and display it
 @app.route("/airplane/<tail_number>")
 @app.route("/airplane/flights/<tail_number>")
 def flights_per_airplane(tail_number):
-  flights = client.agile_data_science.flights_per_airplane.find_one(
+  flights = client.flight_predictor.flights_per_airplane.find_one(
     {'TailNum': tail_number}
   )
   return render_template(
@@ -194,10 +194,10 @@ def flights_per_airplane(tail_number):
 # Controller: Fetch an airplane entity page
 @app.route("/airline/<carrier_code>")
 def airline(carrier_code):
-  airline_summary = client.agile_data_science.airlines.find_one(
+  airline_summary = client.flight_predictor.airlines.find_one(
     {'CarrierCode': carrier_code}
   )
-  airline_airplanes = client.agile_data_science.airplanes_per_carrier.find_one(
+  airline_airplanes = client.flight_predictor.airplanes_per_carrier.find_one(
     {'Carrier': carrier_code}
   )
   return render_template(
@@ -212,7 +212,7 @@ def airline(carrier_code):
 @app.route("/airlines")
 @app.route("/airlines/")
 def airlines():
-  airlines = client.agile_data_science.airplanes_per_carrier.find()
+  airlines = client.flight_predictor.airplanes_per_carrier.find()
   return render_template('all_airlines.html', airlines=airlines)
 
 @app.route("/flights/search")
@@ -396,7 +396,7 @@ def classify_flight_delays():
   # Add a timestamp
   prediction_features['Timestamp'] = predict_utils.get_current_timestamp()
   
-  client.agile_data_science.prediction_tasks.insert_one(
+  client.flight_predictor.prediction_tasks.insert_one(
     prediction_features
   )
   return json_util.dumps(prediction_features)
@@ -428,7 +428,7 @@ def flight_delays_batch_results_page(iso_date):
   iso_tomorrow = rounded_tomorrow_dt.isoformat()
   
   # Fetch today's prediction results from Mongo
-  predictions = client.agile_data_science.prediction_results.find(
+  predictions = client.flight_predictor.prediction_results.find(
     {
       'Timestamp': {
         "$gte": iso_today,
@@ -500,6 +500,7 @@ def flight_delays_page_kafka():
   """Serves flight delay prediction page with polling form"""
   
   form_config = [
+    {'field': 'FlightNum', 'label': 'Flight Number', 'value': 1519},
     {'field': 'DepDelay', 'label': 'Departure Delay', 'value': 5},
     {'field': 'Carrier', 'value': 'AA'},
     {'field': 'FlightDate', 'label': 'Date', 'value': '2016-12-25'},
@@ -513,7 +514,7 @@ def flight_delays_page_kafka():
 def classify_flight_delays_realtime_response(unique_id):
   """Serves predictions to polling requestors"""
   
-  prediction = client.agile_data_science.flight_delay_classification_response.find_one(
+  prediction = client.flight_predictor.flight_delay_classification_response.find_one(
     {
       "UUID": unique_id
     }

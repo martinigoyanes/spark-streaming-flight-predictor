@@ -16,19 +16,24 @@ services:
         - 5000:5000
     depends_on:
       - mongodb-setup
-      - elastic
+      # - elastic
       - kafka
 
   predictor:
     container_name: flight-predictor_predictor
     image: flight-predictor_spark-predictor
+    depends_on:
+      - mongodb
+      - kafka
+    ports: 
+      - 4040:4040
     build:
       context: predictor/
       dockerfile: Dockerfile
 
   mongodb:
     container_name: flight-predictor_mongodb
-    hostname: mongodb
+    hostname: mongo
     image: mongo:5.0.3
     restart: always
     ports:
@@ -51,25 +56,25 @@ services:
     depends_on:
       - mongodb
 
-  elastic:
-    container_name: flight-predictor_elastic
-    hostname: elastic
-    tty: True
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.2
-    restart: always
-    environment:
-        cluster.name: "es-docker"
-        discovery.type: single-node
-        node.name: "elastic"
-        ES_JAVA_OPTS: "-Xms1024m -Xmx1024m"
-    ports:
-        - 9200:9200
-    ulimits:
-        memlock:
-            soft: -1
-            hard: -1
-    volumes:
-        - elastic_data:/usr/share/elasticsearch/data
+  # elastic:
+  #   container_name: flight-predictor_elastic
+  #   hostname: elastic
+  #   tty: True
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.14.2
+  #   restart: always
+  #   environment:
+  #       cluster.name: "es-docker"
+  #       discovery.type: single-node
+  #       node.name: "elastic"
+  #       ES_JAVA_OPTS: "-Xms1024m -Xmx1024m"
+  #   ports:
+  #       - 9200:9200
+  #   ulimits:
+  #       memlock:
+  #           soft: -1
+  #           hard: -1
+  #   volumes:
+  #       - elastic_data:/usr/share/elasticsearch/data
   
   zookeeper:
     container_name: flight-predictor_zookeeper
@@ -88,8 +93,16 @@ services:
         DOCKER_API_VERSION: 1.22
         KAFKA_ADVERTISED_HOST_NAME: kafka
         KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_ADVERTISED_LISTENERS: OUTSIDE://kafka:9092,INSIDE://localhost:9094
+        KAFKA_LISTENERS: OUTSIDE://kafka:9092,INSIDE://localhost:9094
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+        # https://hub.docker.com/r/wurstmeister/kafka/ : Topic will have 1 partition and 1 replica
+        KAFKA_CREATE_TOPICS: "flight_delay_classification_request:1:1"
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
 
 volumes:
   mongo_data:

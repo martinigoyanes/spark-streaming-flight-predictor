@@ -12,10 +12,9 @@ object MakePrediction {
     println("Fligth predictor starting...")
 
     val spark = SparkSession
-      .builder
+      .builder()
       .appName("StructuredNetworkWordCount")
       .master("local[*]")
-      .config("spark.mongodb.output.uri", "mongodb://mongo:27017/flight_predictor.flight_delay_classification_response")
       .getOrCreate()
     import spark.implicits._
 
@@ -138,13 +137,15 @@ object MakePrediction {
     finalPredictions.printSchema()
 
     // Define MongoUri for connection
-    // val writeConfig = WriteConfig(Map("uri" -> "mongodb://mongo:27017/flight_predictor.flight_delay_classification_response"))
+    val writeConfig = WriteConfig(Map("uri" -> "mongodb://mongo:27017/flight_predictor.flight_delay_classification_response"))
 
     // Store to Mongo each streaming batch
     val flightRecommendations = finalPredictions.writeStream.foreachBatch {
       (batchDF: DataFrame, batchId: Long) =>
         MongoSpark.save(batchDF,writeConfig)
     }.start()
+
+
 
     // Console Output for predictions
     val consoleOutput = finalPredictions.writeStream

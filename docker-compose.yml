@@ -16,7 +16,6 @@ services:
         - 5000:5000
     depends_on:
       - mongodb-setup
-      # - elastic
       - kafka
 
   predictor:
@@ -56,26 +55,6 @@ services:
     depends_on:
       - mongodb
 
-  # elastic:
-  #   container_name: flight-predictor_elastic
-  #   hostname: elastic
-  #   tty: True
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.14.2
-  #   restart: always
-  #   environment:
-  #       cluster.name: "es-docker"
-  #       discovery.type: single-node
-  #       node.name: "elastic"
-  #       ES_JAVA_OPTS: "-Xms1024m -Xmx1024m"
-  #   ports:
-  #       - 9200:9200
-  #   ulimits:
-  #       memlock:
-  #           soft: -1
-  #           hard: -1
-  #   volumes:
-  #       - elastic_data:/usr/share/elasticsearch/data
-  
   zookeeper:
     container_name: flight-predictor_zookeeper
     hostname: zookeeper
@@ -109,4 +88,3 @@ volumes:
   elastic_data:
 
 # docker-compose -f docker-compose.yml up
-# docker-compose -f docker-compose.yml run --rm -p 8080:8080 dev-gfadmin-back

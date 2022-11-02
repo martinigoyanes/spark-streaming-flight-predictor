@@ -37,8 +37,6 @@ services:
     restart: always
     ports:
         - 27017:27017
-    volumes:
-        - mongo_data:/data/db
     healthcheck:
       test: echo 'db.runCommand({serverStatus:1}).ok'
       interval: 10s
@@ -82,9 +80,5 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
-
-volumes:
-  mongo_data:
-  elastic_data:
 
 # docker-compose -f docker-compose.yml up

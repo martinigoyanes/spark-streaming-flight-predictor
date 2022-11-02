@@ -76,8 +76,6 @@ services:
         KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
         # https://hub.docker.com/r/wurstmeister/kafka/ : Topic will have 1 partition and 1 replica
         KAFKA_CREATE_TOPICS: "flight_delay_classification_request:1:1"
-    volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
 

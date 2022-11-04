@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: frontend
+  name: frontend
+spec:
+  containers:
+    - env:
+        - name: PROJECT_HOME
+          value: '"."'
+      image: flight-predictor_frontend
+      name: flight-predictor-frontend
+      ports:
+        - containerPort: 5000
+      resources: {}
+  hostname: frontend
+  restartPolicy: OnFailure
+status: {}

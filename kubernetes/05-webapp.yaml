@@ -15,9 +15,8 @@ spec:
         app: webapp
     spec:
       containers:
-        - name: webapp
-          image: flight-predictor_frontend
-          imagePullPolicy: Never
+        - image: martinigoyanes/k8s-webapp
+          name: webapp
           ports:
           - containerPort: 5000
           env:

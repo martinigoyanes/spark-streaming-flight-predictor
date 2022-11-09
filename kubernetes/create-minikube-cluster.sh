@@ -12,9 +12,9 @@ minikube kubectl -- exec -it "pod/${MONGODB_POD_UID}" -- /bin/bash -c "
 apt-get update &&
 apt-get install -y curl &&
 curl -Lko /origin_dest_distances.jsonl http://s3.amazonaws.com/agile_data_science/origin_dest_distances.jsonl &&
-mongoimport --authenticationDatabase=admin --username username --password password --db flight_predictor --collection origin_dest_distances --file origin_dest_distances.jsonl &&
+mongoimport --db flight_predictor --collection origin_dest_distances --file origin_dest_distances.jsonl &&
 mongo flight_predictor --eval 'db.origin_dest_distances.createIndex({Origin: 1, Dest: 1})' &&
-mongo --authenticationDatabase=admin --username username --password password flight_predictor --eval 'db.createCollection(\"flight_delay_classification_response\")'
+mongo flight_predictor --eval 'db.createCollection(\"flight_delay_classification_response\")'
 "
 
 # Start mongo express to easier visualization of data in MongoDB
@@ -27,3 +27,13 @@ minikube kubectl -- apply -f 02-zookeeper.yaml
 ZOOKEEPER_POD_UID=$(minikube kubectl -- get pod | grep zookeeper | awk '{print $1}')
 minikube kubectl -- wait --for=condition=Ready "pod/${ZOOKEEPER_POD_UID}"
 minikube kubectl -- apply -f 03-kafka.yaml
+
+# Wait for kafka to be running before starting Spark job
+KAFKA_POD_UID=$(minikube kubectl -- get pod | grep kafka | awk '{print $1}')
+minikube kubectl -- wait --for=condition=Ready "pod/${KAFKA_POD_UID}"
+minikube kubectl -- apply -f 04-spark.yaml
+
+# Wait for park job to be running before starting webapp
+SPARK_POD_UID=$(minikube kubectl -- get pod | grep spark | awk '{print $1}')
+minikube kubectl -- wait --for=condition=Ready "pod/${SPARK_POD_UID}"
+minikube kubectl -- apply -f 05-webapp.yaml

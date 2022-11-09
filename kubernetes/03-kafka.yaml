@@ -19,9 +19,9 @@ spec:
             - name: DOCKER_API_VERSION
               value: "1.22"
             - name: KAFKA_ADVERTISED_HOST_NAME
-              value: kafka
+              value: kafka-service
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: OUTSIDE://kafka:9092,INSIDE://localhost:9094
+              value: OUTSIDE://kafka-service:9092,INSIDE://localhost:9094
             - name: KAFKA_CREATE_TOPICS
               value: flight_delay_classification_request:1:1
             - name: KAFKA_INTER_BROKER_LISTENER_NAME

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels: 
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - image: mongo:5.0.3
+        name: mongodb
+        # command: ["sh","-c","mongod & apt-get update && apt-get install -y curl &&
+        #           curl -Lko /origin_dest_distances.jsonl http://s3.amazonaws.com/agile_data_science/origin_dest_distances.jsonl && 
+        #           mongoimport --db flight_predictor --collection origin_dest_distances --file origin_dest_distances.jsonl && 
+        #           mongo flight_predictor --eval 'db.origin_dest_distances.createIndex({Origin: 1, Dest: 1})' && 
+        #           mongo flight_predictor --eval 'db.createCollection(\"flight_delay_classification_response\")'"]
+        ports:
+        - containerPort: 27017
+# https://stackoverflow.com/questions/46859004/how-to-include-data-with-mongo-image-in-kubernetes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017

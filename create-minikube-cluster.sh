@@ -3,7 +3,7 @@
 minikube start --vm-driver=virtualbox
 
 # Start MongoDB node and load data into it
-minikube kubectl -- apply -f 00-mongodb.yaml
+minikube kubectl -- apply -f minikube/00-mongodb.yaml
 
 sleep 20
 MONGODB_POD_UID=$(minikube kubectl -- get pod | grep mongodb | awk '{print $1}')
@@ -18,22 +18,26 @@ mongo flight_predictor --eval 'db.createCollection(\"flight_delay_classification
 "
 
 # Start mongo express to easier visualization of data in MongoDB
-minikube kubectl -- apply -f 01-mongo-express.yaml
+minikube kubectl -- apply -f minikube/01-mongo-express.yaml
 
 # Start zookeeper for management of Kafka nodes
-minikube kubectl -- apply -f 02-zookeeper.yaml
+minikube kubectl -- apply -f minikube/02-zookeeper.yaml
 
 # Wait for zookeeper to be running before starting Kafka with specific topic
 ZOOKEEPER_POD_UID=$(minikube kubectl -- get pod | grep zookeeper | awk '{print $1}')
 minikube kubectl -- wait --for=condition=Ready "pod/${ZOOKEEPER_POD_UID}"
-minikube kubectl -- apply -f 03-kafka.yaml
+minikube kubectl -- apply -f minikube/03-kafka.yaml
 
 # Wait for kafka to be running before starting Spark job
 KAFKA_POD_UID=$(minikube kubectl -- get pod | grep kafka | awk '{print $1}')
 minikube kubectl -- wait --for=condition=Ready "pod/${KAFKA_POD_UID}"
-minikube kubectl -- apply -f 04-spark.yaml
+minikube kubectl -- apply -f minikube/04-spark.yaml
 
 # Wait for park job to be running before starting webapp
 SPARK_POD_UID=$(minikube kubectl -- get pod | grep spark | awk '{print $1}')
 minikube kubectl -- wait --for=condition=Ready "pod/${SPARK_POD_UID}"
-minikube kubectl -- apply -f 05-webapp.yaml
+minikube kubectl -- apply -f minikube/05-webapp.yaml
+
+# Wait 3min to all ready and launch webapp
+sleep 180
+minikube service webapp-service

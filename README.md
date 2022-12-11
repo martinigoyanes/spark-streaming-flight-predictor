@@ -12,7 +12,7 @@ gcloud config set project PROJECT_ID
 ```
 gcloud container clusters create-auto flight-delay-predictor-cluster --region=europe-west1	
 ```
-4. Get credentials for the cluster:
+4. Get credentials for the cluster. You need to get authentication credentials to interact with the cluster. This configures kubectl to use the cluster you created:
 ```
 gcloud container clusters get-credentials flight-delay-predictor-cluster --region europe-west1	
 ```
@@ -38,7 +38,7 @@ Launch with:
 ```
 /bin/bash create-minikube-cluster.sh
 ```
-If script does not open browser when docker-compose is finished, then do
+If script does not open browser when minikube is finished, then do
 ```
 minikube service webapp-service
 ```

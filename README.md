@@ -22,7 +22,7 @@ git clone https://github.com/martinigoyanes/spark-streaming-flight-predictor.git
 cd src && /bin/bash create-gke-cluster.sh
 ```
 6. Get External IP of the service ``webapp-service`` and go to [EXTERNAL_IP:5000/flights/delays/predict_kafka](flights/delays/predict_kafka)
-#### Try my working version at [http://34.79.120.227:5000/flights/delays/predict_kafka](http://34.79.120.227:5000/flights/delays/predict_kafka) and click on Submit
+#### Try my working version at [http://34.27.214.100:5000/flights/delays/predict_kafka](http://34.27.214.100:5000/flights/delays/predict_kafka) and click on Submit
 ## Docker Compose
 Launch with:
 ```
